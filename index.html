@@ -1,0 +1,68 @@
+
+<table id="classes"> 
+
+</table>
+
+
+
+<script>
+	
+var getHTML = function ( url, callback ) {
+
+	// Feature detection
+	if ( !window.XMLHttpRequest ) return;
+
+	// Create new request
+	var xhr = new XMLHttpRequest();
+
+	// Setup callback
+	xhr.onload = function() {
+		if ( callback && typeof( callback ) === 'function' ) {
+			callback( this );
+		}
+	}
+
+	// Get the HTML
+	xhr.open( 'GET', url );
+	xhr.responseType = 'json';
+	xhr.send();
+
+};
+
+
+var json;
+var table = document.getElementById("classes");
+
+var urlString = window.location.href
+var url = new URL(urlString);
+var owlClass = url.searchParams.get("class");
+
+
+var dataLocation = "https://api.parliament.uk/query/class_count.json?class="+owlClass;
+
+getHTML( dataLocation, function (response) {
+	json = response.response.results.bindings;
+	json.forEach(
+		function(element){
+			var row = table.insertRow(-1);
+			var leftCell = row.insertCell(0);
+			
+			url = new URL("file:///C:/Work/ClassExplorer/index.html");
+			row.onclick = function(){
+				url.searchParams.set('class', element.otherClass.value);
+				window.location.replace(url);
+			};
+			var rightCell = row.insertCell(1);
+			leftCell.innerText = element.otherClass.value;
+			rightCell.innerHTML = element.count.value;
+
+			
+		}
+	);
+	
+});
+
+
+
+
+</script>
