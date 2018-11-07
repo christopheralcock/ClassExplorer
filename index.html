@@ -1,51 +1,42 @@
 <h1>Click around to see breakdowns for other classes.</h1>
 
-
-
+<div id="wait">
+	Please wait - fetching data
+</div>
 
 <table id="classes"> 
-
 </table>
-
-
 
 <script>
 	
 var getHTML = function ( url, callback ) {
-
-	// Feature detection
 	if ( !window.XMLHttpRequest ) return;
-
-	// Create new request
 	var xhr = new XMLHttpRequest();
-
-	// Setup callback
 	xhr.onload = function() {
 		if ( callback && typeof( callback ) === 'function' ) {
 			callback( this );
 		}
 	}
-
-	// Get the HTML
 	xhr.open( 'GET', url );
 	xhr.responseType = 'json';
 	xhr.send();
-
 };
-
-
 var json;
 var table = document.getElementById("classes");
+var wait = document.getElementById("wait");
 
 var urlString = window.location.href
 var url = new URL(urlString);
+if (url.searchParams.get("class") == null)
+{
+url.searchParams.set('class', "https://id.parliament.uk/schema/Group");
+window.location.replace(url);
+}
 var owlClass = url.searchParams.get("class");
-
-
 var dataLocation = "https://api.parliament.uk/query/class_count.json?class="+owlClass;
-
 getHTML( dataLocation, function (response) {
 	json = response.response.results.bindings;
+	wait.innerHTML="";
 	json.forEach(
 		function(element){
 			var row = table.insertRow(-1);
@@ -59,14 +50,9 @@ getHTML( dataLocation, function (response) {
 			var rightCell = row.insertCell(1);
 			leftCell.innerText = element.otherClass.value;
 			rightCell.innerHTML = element.count.value;
-
 			
 		}
 	);
 	
 });
-
-
-
-
 </script>
