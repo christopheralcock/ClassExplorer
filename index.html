@@ -47,7 +47,7 @@ getHTML( dataLocation, function (response) {
 			var row = table.insertRow(-1);
 			var leftCell = row.insertCell(0);
 			
-			url = new URL("file:///C:/Work/ClassExplorer/index.html");
+			url = new URL(window.location.href);
 			row.onclick = function(){
 				url.searchParams.set('class', element.otherClass.value);
 				window.location.replace(url);
