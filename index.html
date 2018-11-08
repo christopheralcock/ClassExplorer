@@ -1,6 +1,10 @@
 <h1 id="title">Member count and overlap for class</h1>
 <h2>Click rows to see breakdowns for other classes.</h2>
 
+<div id="explanation">
+	What is this? Click for explanation
+</div>
+
 <div id="wait">
 	Please wait - fetching data
 </div>
@@ -13,6 +17,11 @@
 </table>
 
 <script>
+
+var explanation = document.getElementById("explanation");
+explanation.onclick = function(){
+	explanation.innerText = "The UK Parliamentary Digital Service is creating a new dataservice, driven by the needs of beta.parliament.uk.  Underlying this database is a graph triple store.  An important concept in graph databases is that items can belong to many classes simultaneously, allowing us to categorise things by their behaviour and relations rather than rigid table membership or similar.  This tool allows us in the Data & Search team to express these classes by showing how many members they have in common with other classes, allowing users to understand which classes are closely related, by the ordering of the graph, and which have lots of data available for querying, based on the count itself"
+}
 	
 var getHTML = function ( url, callback ) {
 	if ( !window.XMLHttpRequest ) return;
