@@ -29,12 +29,14 @@ var urlString = window.location.href
 var url = new URL(urlString);
 if (url.searchParams.get("class") == null)
 {
-url.searchParams.set('class', "https://id.parliament.uk/schema/Group");
+url.searchParams.set('class', encodeURI("https://id.parliament.uk/schema/Group"));
 window.location.replace(url);
 }
-var owlClass = url.searchParams.get("class");
-var dataLocation = "https://api.parliament.uk/query/class_count.json?class="+owlClass;
-getHTML( dataLocation, function (response) {
+var dataUrl = new URL("https://api.parliament.uk/query/class_count.json");
+dataUrl.searchParams.set('class',url.searchParams.get("class"));
+
+
+getHTML( dataUrl, function (response) {
 	json = response.response.results.bindings;
 	wait.innerHTML="";
 	json.forEach(
@@ -44,7 +46,7 @@ getHTML( dataLocation, function (response) {
 			
 			url = new URL(window.location.href);
 			row.onclick = function(){
-				url.searchParams.set('class', element.otherClass.value);
+				url.searchParams.set('class', encodeURI(element.otherClass.value));
 				window.location.replace(url);
 			};
 			var rightCell = row.insertCell(1);
