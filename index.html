@@ -1,10 +1,15 @@
-<h1>Click around to see breakdowns for other classes.</h1>
+<h1 id="title">Member count and overlap for class</h1>
+<h2>Click rows to see breakdowns for other classes.</h2>
 
 <div id="wait">
 	Please wait - fetching data
 </div>
 
 <table id="classes"> 
+	<tr>
+		<th id="classURI"></th>
+		<th id="countHeader"></th>
+	</tr>
 </table>
 
 <script>
@@ -34,11 +39,22 @@ window.location.replace(url);
 }
 var dataUrl = new URL("https://api.parliament.uk/query/class_count.json");
 dataUrl.searchParams.set('class',url.searchParams.get("class"));
+var title = document.getElementById("title");
 
+title.innerText = "Member count and overlap for " + decodeURI(url.searchParams.get("class"));
 
 getHTML( dataUrl, function (response) {
 	json = response.response.results.bindings;
-	wait.innerHTML="";
+	wait.innerHTML= null;
+	fillTable(json);
+});
+
+
+var fillTable = function (json){
+	var classURI = document.getElementById("classURI");
+	classURI.innerText = "Class URI";
+	var countHeader = document.getElementById("countHeader");
+	countHeader.innerText = "Count of members in common with " + decodeURI(url.searchParams.get("class"));
 	json.forEach(
 		function(element){
 			var row = table.insertRow(-1);
@@ -49,12 +65,15 @@ getHTML( dataUrl, function (response) {
 				url.searchParams.set('class', encodeURI(element.otherClass.value));
 				window.location.replace(url);
 			};
+			row.onmouseover = function(){row.style.backgroundColor = "red"}
+			row.onmouseout = function(){row.style.backgroundColor = "white"}
+
 			var rightCell = row.insertCell(1);
 			leftCell.innerText = element.otherClass.value;
 			rightCell.innerHTML = element.count.value;
 			
 		}
 	);
-	
-});
+
+}
 </script>
