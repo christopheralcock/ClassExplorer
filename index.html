@@ -8,11 +8,6 @@
 			width: 100%;
 		}
 
-		#classURI {
-			width: 99%;
-			font-size: 100%;
-			font-stretch: 100%
-		}
 	</style>
 </head>
 
@@ -38,79 +33,51 @@
 	</table>
 
 	<script>
-		var explanation = document.getElementById("explanation");
-		explanation.onclick = function () {
-			explanation.innerText = "The UK Parliamentary Digital Service is creating a new dataservice, driven by the needs of beta.parliament.uk.  Underlying this database is a graph triple store.  An important concept in graph databases is that items can belong to many classes simultaneously, allowing us to categorise things by their behaviour and relations rather than rigid table membership or similar.  This tool allows us in the Data & Search team to express these classes by showing how many members they have in common with other classes, allowing users to understand which classes are closely related, by the ordering of the graph, and which have lots of data available for querying, based on the count itself"
-		}
 
-
-		var getHTML = function (url, callback) {
-			if (!window.XMLHttpRequest) return;
-			var xhr = new XMLHttpRequest();
-			xhr.onload = function () {
-				if (callback && typeof (callback) === 'function') {
-					callback(this);
-				}
-			}
-			xhr.open('GET', url);
-			xhr.responseType = 'json';
-			xhr.send();
-		};
-		var json;
 		var table = document.getElementById("classes");
 		var wait = document.getElementById("wait");
+		var url = new URL(window.location.href);
 
-		var urlString = window.location.href;
-		var url = new URL(urlString);
 		if (url.searchParams.get("class") == null) {
 			url.searchParams.set('class', encodeURI("https://id.parliament.uk/schema/Group"));
 			window.location.replace(url);
 		}
 		var classToExplore = url.searchParams.get("class");
-
 		var dataUrl = new URL("https://api.parliament.uk/query/class_count.json");
 		dataUrl.searchParams.set('class', classToExplore);
-		var title = document.getElementById("title");
 
+		var title = document.getElementById("title");
 		title.innerText = "Member count and overlap for " + decodeURI(classToExplore);
 
-
-		var onload = function (response) {
-			if (response.response) {
-				json = response.response.results.bindings;
+		fetch(dataUrl)
+			.then(function (response) {
 				wait.innerHTML = null;
-				fillTable(json);
-			}
-		}
-
-		getHTML(dataUrl, onload);
-
-		var fillTable = function (json) {
-			var classURI = document.getElementById("classURI");
-			classURI.innerText = "Class URI";
-			var countHeader = document.getElementById("countHeader");
-			countHeader.innerText = "Count of members in common with " + decodeURI(classToExplore);
-			json.forEach(
-				function (element) {
-					var row;
-					element.otherClass.value == classToExplore ? row = table.insertRow(1) : row = table.insertRow(-1);
-					
-					var leftCell = row.insertCell(0);
-
-					url = new URL(window.location.href);
-					row.onmouseover = function () { row.style.backgroundColor = "Aquamarine" }
-					row.onmouseout = function () { row.style.backgroundColor = "white" }
-
-					var rightCell = row.insertCell(1);
-					var leftLink = document.createElement("a");
-					leftLink.innerText = element.otherClass.value;
-					url.searchParams.set('class', encodeURI(element.otherClass.value));
-					leftLink.setAttribute("href",url.toString());
-					leftCell.appendChild(leftLink);
-					rightCell.innerHTML = element.count.value;
+				return response.json();
+			})
+			.then(
+				function (json) {
+					var classURI = document.getElementById("classURI");
+					classURI.innerText = "Class URI";
+					var countHeader = document.getElementById("countHeader");
+					countHeader.innerText = "Count of members in common with " + decodeURI(classToExplore);
+					json.results.bindings.forEach(
+						function (element) {
+							var row;
+							element.otherClass.value == classToExplore ? row = table.insertRow(1) : row = table.insertRow(-1);
+							var leftCell = row.insertCell(0);
+							url = new URL(window.location.href);
+							row.onmouseover = function () { row.style.backgroundColor = "Aquamarine" }
+							row.onmouseout = function () { row.style.backgroundColor = "white" }
+							var leftLink = document.createElement("a");
+							leftLink.innerText = element.otherClass.value;
+							url.searchParams.set('class', encodeURI(element.otherClass.value));
+							leftLink.setAttribute("href", url.toString());
+							leftCell.appendChild(leftLink);
+							var rightCell = row.insertCell(1);
+							rightCell.innerHTML = element.count.value;
+						}
+					);
 				}
 			);
-		}
-
 	</script>
 </body>
