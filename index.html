@@ -1,8 +1,11 @@
 <head>
+	<meta name="title" content="Class Explorer" />
+	<meta charset="utf-8" />
+	<meta name="twitter:site" content="@chrisalcockdev" />
+	<meta name="twitter:creator" content="@chrisalcockdev" />
 </head>
 
 <body>
-
 	<h1>
 		Member count and overlap for </div><a id="classLink">class</a>
 	</h1>
@@ -82,7 +85,6 @@
 			var rowCount = element.count.value;
 			rowClass == classToExplore ? row = table.insertRow(1) : row = table.insertRow(-1);
 			parseInt(rowCount) > parseInt(classToExploreCount) ? classToExploreCount = rowCount : classToExploreCount;
-			//highlighting(row);
 			var classCell = row.insertCell(0);
 			var classLink = document.createElement("a");
 			classLink.innerText = rowClass;
@@ -94,13 +96,7 @@
 			var percentageCell = row.insertCell(-1);
 			percentageCell.innerHTML = ((rowCount / classToExploreCount) * 100).toFixed(2) + "%";
 		}
-
-		var highlighting = function (item) {
-			item.onmouseover = function () { item.style.backgroundColor = "Aquamarine" };
-			item.onmouseout = function () { item.style.backgroundColor = "white" };
-		}
 	</script>
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
 </body>
