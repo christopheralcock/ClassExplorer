@@ -33,6 +33,7 @@
 		<tr>
 			<th id="classURI"></th>
 			<th id="countHeader"></th>
+			<th id="percentHeader"></th>
 		</tr>
 	</table>
 
@@ -44,6 +45,7 @@
 			window.location.replace(url);
 		}
 		var classToExplore = url.searchParams.get("class");
+		var classToExploreCount = 0;
 		var dataUrl = new URL("https://api.parliament.uk/query/class_count.json");
 		dataUrl.searchParams.set('class', classToExplore);
 
@@ -80,14 +82,19 @@
 			var classURI = document.getElementById("classURI");
 			classURI.innerText = "Class URI";
 			var countHeader = document.getElementById("countHeader");
-			countHeader.innerText = "Count of members in common with " + decodeURI(classToExplore);
+			countHeader.innerText = "Count of members in common";
+			var percentHeader = document.getElementById("percentHeader");
+			percentHeader.innerText = "Percent match";
 		}
 
 		var addRow = function (element) {
 			var row;
 			var table = document.getElementById("classes");
 			var rowClass = element.otherClass.value;
+			var rowCount = element.count.value;
 			rowClass == classToExplore ? row = table.insertRow(1) : row = table.insertRow(-1);
+			rowCount > classToExploreCount ? classToExploreCount = rowCount : classToExploreCount;
+
 			//highlighting(row);
 			var classCell = row.insertCell(0);
 			var classLink = document.createElement("a");
@@ -95,8 +102,10 @@
 			url.searchParams.set('class', encodeURI(rowClass));
 			classLink.setAttribute("href", url.toString());
 			classCell.appendChild(classLink);
-			var countCell = row.insertCell(1);
-			countCell.innerHTML = element.count.value;
+			var countCell = row.insertCell(-1);
+			countCell.innerHTML = rowCount;
+			var percentageCell = row.insertCell(-1);
+			percentageCell.innerHTML = ((rowCount/classToExploreCount)*100).toFixed(2) + "%";
 		}
 
 		var highlighting = function (item) {
