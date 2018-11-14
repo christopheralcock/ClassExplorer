@@ -12,7 +12,9 @@
 
 <body>
 
-	<h1 id="title">Member count and overlap for class</h1>
+	<h1>
+		Member count and overlap for </div><a id="classLink">class</a>
+	</h1>
 	<h2>Click rows to see breakdowns for other classes.</h2>
 
 	<div id="explanation">
@@ -42,8 +44,9 @@
 		var dataUrl = new URL("https://api.parliament.uk/query/class_count.json");
 		dataUrl.searchParams.set('class', classToExplore);
 
-		var title = document.getElementById("title");
-		title.innerText = "Member count and overlap for " + decodeURI(classToExplore);
+		var classLink = document.getElementById("classLink");
+		classLink.innerText = classToExplore;
+		classLink.setAttribute("href", classToExplore);
 
 		var explanation = document.getElementById("explanation");
 		explanation.onclick = function () {
@@ -79,13 +82,14 @@
 		var addRow = function (element) {
 			var row;
 			var table = document.getElementById("classes");
-			element.otherClass.value == classToExplore ? row = table.insertRow(1) : row = table.insertRow(-1);
+			var rowClass = element.otherClass.value;
+			rowClass == classToExplore ? row = table.insertRow(1) : row = table.insertRow(-1);
 			var leftCell = row.insertCell(0);
 			url = new URL(window.location.href);
 			highlighting(row);
 			var leftLink = document.createElement("a");
-			leftLink.innerText = element.otherClass.value;
-			url.searchParams.set('class', encodeURI(element.otherClass.value));
+			leftLink.innerText = rowClass;
+			url.searchParams.set('class', encodeURI(rowClass));
 			leftLink.setAttribute("href", url.toString());
 			leftCell.appendChild(leftLink);
 			var rightCell = row.insertCell(1);
