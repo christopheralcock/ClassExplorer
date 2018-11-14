@@ -1,5 +1,6 @@
 <head>
 	<style>
+
 	</style>
 </head>
 
@@ -94,7 +95,7 @@
 			var countCell = row.insertCell(-1);
 			countCell.innerHTML = rowCount;
 			var percentageCell = row.insertCell(-1);
-			percentageCell.innerHTML = ((rowCount/classToExploreCount)*100).toFixed(2) + "%";
+			percentageCell.innerHTML = ((rowCount / classToExploreCount) * 100).toFixed(2) + "%";
 		}
 
 		var highlighting = function (item) {
@@ -102,4 +103,13 @@
 			item.onmouseout = function () { item.style.backgroundColor = "white" };
 		}
 	</script>
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
