@@ -7,7 +7,6 @@
 		table {
 			width: 100%;
 		}
-
 	</style>
 </head>
 
@@ -33,12 +32,9 @@
 	</table>
 
 	<script>
-
-		var table = document.getElementById("classes");
-		var wait = document.getElementById("wait");
 		var url = new URL(window.location.href);
 
-		if (url.searchParams.get("class") == null) {
+		if (!url.searchParams.get("class")) {
 			url.searchParams.set('class', encodeURI("https://id.parliament.uk/schema/Group"));
 			window.location.replace(url);
 		}
@@ -51,33 +47,49 @@
 
 		fetch(dataUrl)
 			.then(function (response) {
-				wait.innerHTML = null;
 				return response.json();
 			})
-			.then(
-				function (json) {
-					var classURI = document.getElementById("classURI");
-					classURI.innerText = "Class URI";
-					var countHeader = document.getElementById("countHeader");
-					countHeader.innerText = "Count of members in common with " + decodeURI(classToExplore);
-					json.results.bindings.forEach(
-						function (element) {
-							var row;
-							element.otherClass.value == classToExplore ? row = table.insertRow(1) : row = table.insertRow(-1);
-							var leftCell = row.insertCell(0);
-							url = new URL(window.location.href);
-							row.onmouseover = function () { row.style.backgroundColor = "Aquamarine" }
-							row.onmouseout = function () { row.style.backgroundColor = "white" }
-							var leftLink = document.createElement("a");
-							leftLink.innerText = element.otherClass.value;
-							url.searchParams.set('class', encodeURI(element.otherClass.value));
-							leftLink.setAttribute("href", url.toString());
-							leftCell.appendChild(leftLink);
-							var rightCell = row.insertCell(1);
-							rightCell.innerHTML = element.count.value;
-						}
-					);
-				}
-			);
+			.then(function (json) {
+				hideWait();
+				setTableHeaders();
+				json.results.bindings.forEach(
+					function (element) {
+						addRows(element);
+					}
+				);
+			})
+
+		var hideWait = function () {
+			var wait = document.getElementById("wait");
+			wait.innerHTML = null;
+		}
+
+		var setTableHeaders = function () {
+			var classURI = document.getElementById("classURI");
+			classURI.innerText = "Class URI";
+			var countHeader = document.getElementById("countHeader");
+			countHeader.innerText = "Count of members in common with " + decodeURI(classToExplore);
+		}
+
+		var addRows = function (element) {
+			var row;
+			var table = document.getElementById("classes");
+			element.otherClass.value == classToExplore ? row = table.insertRow(1) : row = table.insertRow(-1);
+			var leftCell = row.insertCell(0);
+			url = new URL(window.location.href);
+			highlighting(row);
+			var leftLink = document.createElement("a");
+			leftLink.innerText = element.otherClass.value;
+			url.searchParams.set('class', encodeURI(element.otherClass.value));
+			leftLink.setAttribute("href", url.toString());
+			leftCell.appendChild(leftLink);
+			var rightCell = row.insertCell(1);
+			rightCell.innerHTML = element.count.value;
+		}
+
+		var highlighting = function (item) {
+			item.onmouseover = function () { item.style.backgroundColor = "Aquamarine" }
+			item.onmouseout = function () { item.style.backgroundColor = "white" }
+		}
 	</script>
 </body>
