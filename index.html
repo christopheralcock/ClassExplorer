@@ -1,9 +1,13 @@
 <head>
 	<title>Class Explorer</title>
 	<meta charset="utf-8" />
-	<meta name="twitter:site" content="@chrisalcockdev" />
 	<meta name="twitter:creator" content="@chrisalcockdev" />
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<style>
+		#classes {
+			display : none;
+		}
+	</style>
 </head>
 
 <body>
@@ -51,6 +55,8 @@
 			explanation.innerText = "The UK Parliamentary Digital Service is creating a new dataservice, driven by the needs of beta.parliament.uk.  Underlying this database is a graph triple store.  An important concept in graph databases is that items can belong to many classes simultaneously, allowing us to categorise things by their behaviour and relations rather than rigid table membership or similar.  This tool allows us in the Data & Search team to express these classes by showing how many members they have in common with other classes, allowing users to understand which classes are closely related, by the ordering of the graph, and which have lots of data available for querying, based on the count itself"
 		}
 
+		var table = document.getElementById("classes");
+
 		fetch(dataUrl)
 			.then(function (response) {
 				return response.json();
@@ -60,9 +66,10 @@
 				setTableHeaders();
 				json.results.bindings.forEach(
 					function (element) {
-						addRow(element);
+						addRow(element, table);
 					}
 				);
+				table.style.display = "block";
 			})
 
 		var hideWait = function () {
@@ -79,9 +86,8 @@
 			percentHeader.innerText = "Percent match";
 		}
 
-		var addRow = function (element) {
+		var addRow = function (element, table) {
 			var row;
-			var table = document.getElementById("classes");
 			var rowClass = element.otherClass.value;
 			var rowCount = element.count.value;
 			rowClass == classToExplore ? row = table.insertRow(1) : row = table.insertRow(-1);
