@@ -14,11 +14,12 @@
 	<h1>
 		Member count and overlap for </div><a id="classLink">class</a>
 	</h1>
-	<h2>Click rows to see breakdowns for other classes.</h2>
 
 	<h3 id="explanation">
 		What is this? Click for explanation
 	</h3>
+
+	<h3 id="instruction"></h3>
 
 	<a id="environmentControl"></a>
 
@@ -89,6 +90,8 @@
 
 		var showTable = function () {
 			table.style.display = "inline";
+			var instruction = document.getElementById("instruction");
+			instruction.innerText = "Click rows to see breakdowns for other classes.";
 		}
 
 		var setEnvironment = function () {
