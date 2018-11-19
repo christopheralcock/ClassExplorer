@@ -15,9 +15,11 @@
 		Member count and overlap for </div><a id="classLink">class</a>
 	</h1>
 
-	<h3 id="explanation">
-		What is this? Click for explanation
-	</h3>
+	<a id="explanation" href="https://github.com/christopheralcock/ClassExplorer/blob/master/README.md" target="_blank">
+		What is this?
+	</a>
+
+	<h3 id="noResult"></h3>
 
 	<h3 id="instruction"></h3>
 
@@ -59,12 +61,6 @@
 		classLink.innerText = classToExplore;
 		classLink.setAttribute("href", classToExplore);
 		classLink.setAttribute("target", "_blank");
-
-		var explanation = document.getElementById("explanation");
-		explanation.onclick = function () {
-			explanation.innerText = "The UK Parliamentary Digital Service is creating a new dataservice, driven by the needs of beta.parliament.uk.  Underlying this database is a graph triple store.  An important concept in graph databases is that items can belong to many classes simultaneously, allowing us to categorise things by their behaviour and relations rather than rigid table membership or similar.  This tool allows us in the Data & Search team to express these classes by showing how many members they have in common with other classes, allowing users to understand which classes are closely related, by the ordering of the graph, and which have lots of data available for querying, based on the count itself"
-		}
-
 		var table = document.getElementById("classes");
 
 		fetch(dataUrl)
@@ -74,12 +70,17 @@
 			.then(function (json) {
 				hideWait();
 				setTableHeaders();
-				json.results.bindings.forEach(
-					function (element) {
-						addRow(element, table);
-					}
-				);
-				showTable();
+				if (json.results.bindings.length > 1) {
+					json.results.bindings.forEach(
+						function (element) {
+							addRow(element, table);
+						}
+					);
+					showTable();
+				}
+				else {
+					noResults();
+				}
 				setEnvironment();
 			})
 
@@ -100,7 +101,7 @@
 			var changeEnvironmentLink = url;
 			changeEnvironmentLink.searchParams.set("env", notEnvironment);
 			changeEnvironmentLink.searchParams.set("class", classToExplore);
-			environmentControl.setAttribute("href", changeEnvironmentLink );
+			environmentControl.setAttribute("href", changeEnvironmentLink);
 		}
 
 		var setTableHeaders = function () {
@@ -129,5 +130,11 @@
 			var percentageCell = row.insertCell(-1);
 			percentageCell.innerHTML = ((rowCount / classToExploreCount) * 100).toFixed(2) + "%";
 		}
+
+		var noResults = function () {
+			var noResultSection = document.getElementById("noResult");
+			noResultSection.innerText = "No members for class " + classToExplore;
+		}
+
 	</script>
 </body>
