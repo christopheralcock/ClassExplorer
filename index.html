@@ -2,7 +2,7 @@
 	<title>Class Explorer</title>
 	<meta charset="utf-8" />
 	<meta name="twitter:creator" content="@chrisalcockdev" />
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 	<style>
 		#classes {
 			display: none
@@ -30,7 +30,7 @@
 		<img src="http://textfiles.com/underconstruction/CoColosseumField5989Construction.gif">
 	</h3>
 
-	<table id="classes" class="table table-bordered table-responsive table-striped">
+	<table id="classes" class="table table-striped table-responsive">
 		<tr>
 			<th id="classURI"></th>
 			<th id="countHeader"></th>
@@ -90,7 +90,7 @@
 		}
 
 		var showTable = function () {
-			table.style.display = "inline";
+			table.style.display = "unset";
 			var instruction = document.getElementById("instruction");
 			instruction.innerText = "Click rows to see breakdowns for other classes.";
 		}
@@ -133,7 +133,7 @@
 
 		var noResults = function () {
 			var noResultSection = document.getElementById("noResult");
-			noResultSection.innerText = "No members for class " + classToExplore;
+			noResultSection.innerText = "No members for " + classToExplore;
 		}
 
 	</script>
