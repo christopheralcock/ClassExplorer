@@ -1,0 +1,209 @@
+<head>
+	<title>Class Explorer</title>
+	<meta charset="utf-8" />
+	<meta name="twitter:creator" content="@chrisalcockdev" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+	<style>
+		#classes {
+			display: none
+		}
+	</style>
+</head>
+
+<body>
+	<h1>
+		Member count and overlap for </div><a id="classLink">class</a>
+	</h1>
+
+	<a id="explanation" href="https://github.com/christopheralcock/ClassExplorer/blob/master/README.md" target="_blank">
+		What is this?
+	</a>
+
+	<h3 id="noResult"></h3>
+
+	<h3 id="instruction"></h3>
+
+	<a id="environmentControl"></a>
+
+	<h3 id="wait">
+		Please wait - fetching data
+		<img src="http://textfiles.com/underconstruction/CoColosseumField5989Construction.gif">
+	</h3>
+
+	<table id="classes" class="table table-striped table-responsive">
+		<tr>
+			<th id="classURI"></th>
+			<th id="liveCountHeader"></th>
+			<th id="livePercentHeader"></th>
+			<th id="stagingCountHeader"></th>
+			<th id="stagingPercentHeader"></th>
+		</tr>
+	</table>
+
+	<script>
+	
+		var url = new URL(window.location.href);
+
+		if (!url.searchParams.get("class")) {
+			url.searchParams.set("class", encodeURI("https://id.parliament.uk/schema/Group"));
+			window.location.replace(url);
+		}
+		var classToExplore = url.searchParams.get("class");
+		var classToExploreCount = 0;
+		var liveDataUrl = new URL("https://api.parliament.uk/query/class_count.json");
+		var stagingDataUrl = new URL("https://api.parliament.uk/query/Staging/class_count.json");
+		liveDataUrl.searchParams.set("class", classToExplore);
+		stagingDataUrl.searchParams.set("class", classToExplore);
+		
+		var liveData;
+		var stagingData;
+		var allClasses = [];
+		var masterJson = [];
+		
+		function uniq(a) {
+		return a.sort().filter(function(item, pos, ary) {
+				return !pos || item != ary[pos - 1];
+			})
+		}
+		var table = document.getElementById("classes");
+
+		
+		async function fetchURLs() {
+			try {
+				var data = await Promise.all([
+					fetch(liveDataUrl).then((response) => response.json()),
+					fetch(stagingDataUrl).then((response) => response.json()),
+				]);
+				
+				liveData = data[0].results.bindings;
+				stagingData = data[1].results.bindings;
+				if (liveData.length > 1){
+					for (var className of liveData) {
+						allClasses.push(className.otherClass.value);
+					}
+				}
+				if (stagingData.length > 1){
+					for (var className of stagingData) {
+						allClasses.push(className.otherClass.value);
+					}
+				}
+				allClasses = uniq(allClasses);
+				for (var className of allClasses) {
+					var liveCount = 0;
+					if (liveData.length > 1){
+						for (var entry of liveData) {
+							if (entry.otherClass.value === className){
+								liveCount = entry.count.value;
+							}
+						}
+					}
+					var stagingCount = 0;
+					if (stagingData.length > 1){
+						for (var entry of stagingData) {
+							if (entry.otherClass.value === className){
+								stagingCount = entry.count.value;
+							}
+						}
+					}
+					masterJson.push(
+						{
+							"otherClassName" : className,
+							"liveCount" : liveCount,
+							"stagingCount" : stagingCount
+						}
+					)
+					if (liveData.length > 1){
+						masterJson = masterJson.sort(function(a,b){
+							return b.liveCount - a.liveCount;
+							}
+						)
+					} else {
+						masterJson = masterJson.sort(function(a,b){
+							return b.stagingCount - a.stagingCount;
+							}
+						)
+					}
+				}
+				
+				hideWait();
+				setTableHeaders();
+				if (masterJson.length > 1) {
+					masterJson.forEach(
+						function (element) {
+							addRow(element, table);
+						}
+					);
+					showTable();
+				}
+				else {
+					noResults();
+				}
+
+
+			} catch (error) {
+				console.log(error);
+				noResults();
+				hideWait();
+			}
+		}
+	
+		var classLink = document.getElementById("classLink");
+		classLink.innerText = classToExplore;
+		classLink.setAttribute("href", classToExplore);
+		classLink.setAttribute("target", "_blank");
+
+		fetchURLs();
+
+		var hideWait = function () {
+			var wait = document.getElementById("wait");
+			wait.innerHTML = null;
+		}
+
+		var showTable = function () {
+			table.style.display = "unset";
+			var instruction = document.getElementById("instruction");
+			instruction.innerText = "Click rows to see breakdowns for other classes.";
+		}
+
+		var setTableHeaders = function () {
+			document.getElementById("classURI").innerText = "Class URI";
+			document.getElementById("liveCountHeader").innerText = "Live Count of members in common";
+			document.getElementById("livePercentHeader").innerText = "Live Percent match";
+			document.getElementById("stagingCountHeader").innerText = "Staging Count of members in common";
+			document.getElementById("stagingPercentHeader").innerText = "Staging Percent match";
+		}
+
+		var addRow = function (element, table) {
+			var row;
+			var rowClass = element.otherClassName;
+			var rowLiveCount = element.liveCount;
+			var rowStagingCount = element.stagingCount;
+			rowClass == classToExplore ? row = table.insertRow(1) : row = table.insertRow(-1);
+			if (rowLiveCount > 0){
+				parseInt(rowLiveCount) > parseInt(classToExploreCount) ? classToExploreCount = rowLiveCount : classToExploreCount;
+			} else {
+				parseInt(rowStagingCount) > parseInt(classToExploreCount) ? classToExploreCount = rowStagingCount : classToExploreCount;
+			}
+			var classCell = row.insertCell(0);
+			var classLink = document.createElement("a");
+			classLink.innerText = rowClass;
+			url.searchParams.set("class", encodeURI(rowClass));
+			classLink.setAttribute("href", url.toString());
+			classCell.appendChild(classLink);
+			var liveCountCell = row.insertCell(-1);
+			liveCountCell.innerHTML = rowLiveCount;
+			var livePercentageCell = row.insertCell(-1);
+			livePercentageCell.innerHTML = ((rowLiveCount / classToExploreCount) * 100).toFixed(2) + "%";
+			var stagingCountCell = row.insertCell(-1);
+			stagingCountCell.innerHTML = rowStagingCount;
+			var stagingPercentageCell = row.insertCell(-1);
+			stagingPercentageCell.innerHTML = ((rowStagingCount / classToExploreCount) * 100).toFixed(2) + "%";
+		}
+
+		var noResults = function () {
+			var noResultSection = document.getElementById("noResult");
+			noResultSection.innerText = "No members for " + classToExplore;
+		}
+
+	</script>
+</body>
